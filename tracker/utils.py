@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 import bson
 import colorit
 
@@ -46,10 +47,11 @@ def permutations(n):
         return [p + [n] for p in perm]
 
 
-class QuadTree:
-    def __init__(self, points, bounds, depth=0):
+class QuadTreeMedian:
+    def __init__(self, points, begin, end, depth=0):
         self.points = points
-        self.bounds = bounds
+        self.begin = begin
+        self.end = end
         self.subdivisions = []
         self.depth = depth
         self.build()
@@ -57,39 +59,35 @@ class QuadTree:
     def build(self):
         if len(self.points) <= 1:
             return
-        x_min = min(p[0] for p in self.points)
-        x_max = max(p[0] for p in self.points)
-        y_min = min(p[1] for p in self.points)
-        y_max = max(p[1] for p in self.points)
-        x_mid = (x_min + x_max) / 2
-        y_mid = (y_min + y_max) / 2
-        self.subdivisions.append(QuadTree([p for p in self.points if p[0] < x_mid and p[1] < y_mid], self.side/2, self.depth+1))
-        self.subdivisions.append(QuadTree([p for p in self.points if p[0] >= x_mid and p[1] < y_mid], self.side/2, self.depth+1))
-        self.subdivisions.append(QuadTree([p for p in self.points if p[0] < x_mid and p[1] >= y_mid], self.side/2, self.depth+1))
-        self.subdivisions.append(QuadTree([p for p in self.points if p[0] >= x_mid and p[1] >= y_mid], self.side/2, self.depth+1))
+        x_m = np.median([p[0] for p in self.points])
+        y_m = np.median([p[1] for p in self.points])
+        self.subdivisions.append(QuadTreeMedian([p for p in self.points if p[0] < x_m and p[1] < y_m], self.begin, (self.begin[0], y_m), self.depth+1))
+        self.subdivisions.append(QuadTreeMedian([p for p in self.points if p[0] >= x_m and p[1] < y_m], (x_m, self.begin[1]), (self.end[0], y_m), self.depth+1))
+        self.subdivisions.append(QuadTreeMedian([p for p in self.points if p[0] < x_m and p[1] >= y_m], (self.begin[0], y_m), (x_m, self.end[1]), self.depth+1))
+        self.subdivisions.append(QuadTreeMedian([p for p in self.points if p[0] >= x_m and p[1] >= y_m], (x_m, y_m), self.end, self.depth+1))
+    
+    def isEmpty(self):
+        return len(self.points)<=0
 
     def getPoints(self):
         return self.points
 
     def getSubdivisions(self):
         return self.subdivisions
-
-    def getSubdivision(self, x, y):
-        if len(self.subdivisions) == 0:
-            return self
-        if x < self.side/2:
-            if y < self.side/2:
-                return self.subdivisions[0]
-            else:
-                return self.subdivisions[1]
-        else:
-            if y < self.side/2:
-                return self.subdivisions[2]
-            else:
-                return self.subdivisions[3]
     
     def getPoints(self):
         return self.points
     
     def getDepth(self):
         return self.depth
+
+
+def getSubAfterN(quadtree, n):
+    if n<=0:
+        return [quadtree]
+    subdivs = quadtree.getSubdivisions()
+    output = []
+    for i in range(4):
+        if not subdivs[i].isEmpty():
+            output += getSubAfterN(subdivs[i], n-1)
+    return output

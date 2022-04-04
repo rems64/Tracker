@@ -168,9 +168,13 @@ def maxSpeed(tracks):
             max_speed = speed
     return max_speed
 
-def getHighDensityAreas(points, side):
-    while currentSubdivision
+# def getHighDensityAreas(points, side):
+#     xS = [p[0] for p in points]
+#     yS = [p[1] for p in points]
+#     dx = np.max(xS)-np.min(xS)
+#     dy = np.max(yS)-np.min(yS)
+#     quadtree = utils.QuadTreeMedian(points, (np.min(xS), np.min(yS)), (np.max(xS), np.max(yS)))
+#     utils.getSubAfterN(quadtree, 5)
 
-
-def solveByAccelerationOnSubset(tracks, data):
+# def getHighDensityAreas(points, side):
     
