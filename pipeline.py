@@ -30,6 +30,7 @@ if __name__ == "__main__":
     utils.log("Processed successfully, solving features")
     b = time.time()
     solved = sf.solveByAcceleration(tracked)
+    # solved = sf.smartSolve(tracked)
     utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
 
     end = time.time()

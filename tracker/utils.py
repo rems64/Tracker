@@ -47,6 +47,9 @@ def permutations(n):
         return [p + [n] for p in perm]
 
 
+def clamp(x, a, b):
+    return x if x>=a and x<=b else (a if x<a else b)
+
 class QuadTreeMedian:
     def __init__(self, points, begin, end, depth=0):
         self.points = points

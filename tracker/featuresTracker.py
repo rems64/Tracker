@@ -122,37 +122,3 @@ def trackFeatures(cap, noise_level=0, frame_limit=0, show=False, filename=""):
     
     tracked["infos"]["max_tracks"] = maxDetected
     return tracked
-    """
-    frame+=1
-    ret, pic = cap.read()
-    if ret:
-        sized = cv2.resize(pic, (0, 0), fx=0.5, fy=0.5)
-        if noiseLvl>0:
-            noise = np.random.randint(0, noiseLvl, (sized.shape[0], sized.shape[1], 3))
-
-            sized = np.uint8(np.clip(sized + noise, 0, 255))
-        # To replace with a more elaborate processing
-        ret, thresh = cv2.threshold(cv2.cvtColor(sized, cv2.COLOR_BGR2GRAY), 127, 255, 0)
-        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        detected = []
-        for cnt in contours:
-            if args.show:
-                cv2.polylines(sized, cnt, True, (0, 255, 0), 2)
-            M = cv2.moments(cnt)
-            # print(M)
-            # exit()
-            if M["m00"] != 0:
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                detected.append((cX, cY))
-        tracks.append((frame, detected))
-        if args.show:
-            for c in detected:
-                cv2.circle(sized, c, 10, (0, 0, 255), 2)
-            cv2.imshow("Tracking...", sized)
-            key = cv2.waitKey(1)
-            if key==ord('q'):
-                args.show = False
-    else:
-        break
-    """
