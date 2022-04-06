@@ -1,5 +1,6 @@
 import cv2
 from . import utils
+import matplotlib.pyplot as plt
 
 def visualize(cap, data):
     frame = 0
@@ -54,3 +55,25 @@ def visualize(cap, data):
             frame += 1
         else:
             break
+
+
+def drawCurves(data):
+    tracks = data["tracks"]
+    i=0
+    for track in tracks:
+        plt.figure()
+        plt.subplot(3, 1, 1)
+        plt.plot([frame["location"][0] for frame in track["frames"]])
+        plt.plot([frame["location"][1] for frame in track["frames"]])
+        plt.legend(["x", "y"])
+        plt.subplot(3, 1, 2)
+        plt.plot([track["frames"][i+1]["location"][0]-track["frames"][i]["location"][0] for i in range(len(track["frames"])-1)])
+        plt.plot([track["frames"][i+1]["location"][1]-track["frames"][i]["location"][1] for i in range(len(track["frames"])-1)])
+        plt.legend(["x", "y"])
+        plt.subplot(3, 1, 3)
+        plt.plot([track["frames"][i+2]["location"][0]-2*track["frames"][i+1]["location"][0]+track["frames"][i]["location"][0] for i in range(len(track["frames"])-2)])
+        plt.plot([track["frames"][i+2]["location"][1]-2*track["frames"][i+1]["location"][1]+track["frames"][i]["location"][1] for i in range(len(track["frames"])-2)])
+        plt.legend(["x", "y"])
+        plt.title("Track " + str(i+1))
+        i+=1
+    plt.show()

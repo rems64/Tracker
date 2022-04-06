@@ -8,6 +8,7 @@ argparser.add_argument("-i", "--input", help="Path to the video file", required=
 argparser.add_argument("-o", "--output", help="Path to the output file", required=True)
 argparser.add_argument("-n", "--noise", help="Noise level (0-1)", required=False, default=0)
 argparser.add_argument("-f", "--frame-limit", help="Number of frames to process", required=False, default=0)
+argparser.add_argument("-c", "--usecache", help="Use cached result", required=False, default=False)
 args = argparser.parse_args()
 
 
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 
     utils.log("Processed successfully, solving features")
     b = time.time()
-    solved = sf.solveByAcceleration(tracked)
+    solved = sf.solveBySpeed(tracked)
     # solved = sf.smartSolve(tracked)
     utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
 
@@ -37,6 +38,7 @@ if __name__ == "__main__":
     utils.log("Features solved, visualizing")
 
     vz.visualize(utils.open_video(args.input), tracked)
+    # vz.drawCurves(tracked)
 
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
