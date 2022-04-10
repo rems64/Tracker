@@ -107,8 +107,11 @@ def solveBySpeed(data):
                 if track in assigned:
                     continue
                 utils.log("Found an empty track", utils.logTypes.warning)
-                if len(tracks[track]["frames"]) > 0:
-                    tracks[track]["frames"].append({"location": tracks[track]["frames"][-1]["location"]})
+                if len(tracks[track]["frames"]) > 1:
+                    # tracks[track]["frames"].append({"location": (0, 0)})
+                    a = tracks[track]["frames"][-2]["location"]
+                    b = tracks[track]["frames"][-1]["location"]
+                    tracks[track]["frames"].append({"location": [2*b[0]-a[0], 2*b[1]-a[1]]})
                 else:
                     tracks[track]["frames"].append({"location": (0, 0)})
     data["tracks"] = tracks

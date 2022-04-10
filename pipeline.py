@@ -37,10 +37,10 @@ if __name__ == "__main__":
     end = time.time()
     utils.log("Features solved, visualizing")
 
-    vz.visualize(utils.open_video(args.input), tracked)
-    # vz.drawCurves(tracked)
+    # vz.visualize(utils.open_video(args.input), tracked)
+    vz.drawCurves(tracked)
 
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
-    utils.save_json(tracked, args.output)
+    utils.save_bson(tracked, args.output)
     utils.log("Saved to {}".format(args.output))

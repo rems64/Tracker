@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 import bson
+import json
 import colorit
 
 # colorit.init_colorit()
+
 
 class logTypes:
     """
@@ -13,6 +15,7 @@ class logTypes:
     timer = colorit.Colors.blue
     warning = colorit.Colors.yellow
     error = colorit.Colors.red
+    trace = colorit.Colors.white
 
 def open_video(video_file):
     """
@@ -21,18 +24,32 @@ def open_video(video_file):
     cap = cv2.VideoCapture(video_file)
     return cap
 
-def save_json(data, file_name):
+def save_bson(data, file_name):
     """
     Save the data in a json file
     """
     with open(file_name, "wb") as f:
         f.write(bson.dumps(data))
 
+def open_bson(file_name):
+    """
+    Open the json file
+    """
+    with open(file_name, "rb") as f:
+        return bson.loads(f.read())
+
+def open_json(file_name):
+    """
+    Open the json file
+    """
+    with open(file_name, "r") as f:
+        return json.loads(f.read())
+
 def log(msg, type=logTypes.info):
     """
     Log the data
     """
-    pretext = "[WARN]" if type==logTypes.warning else "[INFO]" if type==logTypes.info else "[TIME]" if type==logTypes.timer else "[ERRO]"
+    pretext = "[WARN]" if type==logTypes.warning else "[INFO]" if type==logTypes.info or type==logTypes.trace else "[TIME]" if type==logTypes.timer else "[ERRO]"
     print(colorit.color(pretext+" {}".format(msg), type))
 
 
