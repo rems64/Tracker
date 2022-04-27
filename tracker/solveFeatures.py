@@ -88,6 +88,34 @@ def getBestCandidateBySpeed(candidate, tracks, assigned):
     return best_track
 
 
+def solvePass(tracks):
+    for track in tracks:
+        frames = track["frames"]
+        holes = []
+        inHole = False
+        start = 0
+        i=0
+        for frame in frames:
+            if frame["location"] == (0, 0):
+                if not inHole:
+                    inHole=True
+                    start=i
+            else:
+                if inHole:
+                    holes+=[(start,i)]
+                    inHole=False
+            i+=1
+        
+        if len(holes):
+            for hole in holes:
+                length = hole[1]-hole[0]
+                xStep = (frames[hole[1]]["location"][0]-frames[hole[0]]["location"][0])/length
+                yStep = (frames[hole[1]]["location"][1]-frames[hole[0]]["location"][1])/length
+                for i in range(length):
+                    frames[hole[0]+i]["location"] = (xStep*i, yStep*i)
+    return tracks
+
+
 def solveBySpeed(data):
     frames = data["frames"]
     tracks = [{'trackId': uuid.uuid4(), 'frames': []} for _ in range(int(data["infos"]["max_tracks"]))]
@@ -108,12 +136,13 @@ def solveBySpeed(data):
                     continue
                 utils.log("Found an empty track", utils.logTypes.warning)
                 if len(tracks[track]["frames"]) > 1:
-                    # tracks[track]["frames"].append({"location": (0, 0)})
-                    a = tracks[track]["frames"][-2]["location"]
-                    b = tracks[track]["frames"][-1]["location"]
-                    tracks[track]["frames"].append({"location": [2*b[0]-a[0], 2*b[1]-a[1]]})
+                    tracks[track]["frames"].append({"location": (0, 0)})
+                    # a = tracks[track]["frames"][-2]["location"]
+                    # b = tracks[track]["frames"][-1]["location"]
+                    # tracks[track]["frames"].append({"location": [2*b[0]-a[0], 2*b[1]-a[1]]})
                 else:
                     tracks[track]["frames"].append({"location": (0, 0)})
+    tracks = solvePass(tracks)
     data["tracks"] = tracks
     return data
 

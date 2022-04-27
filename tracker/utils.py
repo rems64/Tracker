@@ -53,15 +53,19 @@ def log(msg, type=logTypes.info):
     print(colorit.color(pretext+" {}".format(msg), type))
 
 
-def permutations(n):
+def permutations(l):
     """
     Get all permutations of n
     """
-    if n == 1:
-        return [[1]]
+    if len(l)<=1:
+        return [l]
     else:
-        perm = permutations(n-1)
-        return [p + [n] for p in perm]
+        perms = permutations(l[1:])
+        out = []
+        for perm in perms:
+            for i in range(len(l)):
+                out.append(perm[:i] + [l[0]] + perm[i:])
+        return out
 
 
 def clamp(x, a, b):

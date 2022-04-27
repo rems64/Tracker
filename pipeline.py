@@ -20,6 +20,10 @@ if __name__ == "__main__":
     import tracker.utils as utils
 
     utils.log("Starting pipeline")
+    tab = [1,2,3,4,5]
+    perm = utils.permutations(tab)
+    print(len(perm))
+
     begin = time.time()
     cap = utils.open_video(args.input)
 
@@ -37,8 +41,8 @@ if __name__ == "__main__":
     end = time.time()
     utils.log("Features solved, visualizing")
 
-    # vz.visualize(utils.open_video(args.input), tracked)
-    vz.drawCurves(tracked)
+    vz.visualize(utils.open_video(args.input), tracked)
+    # vz.drawCurves(tracked)
 
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     

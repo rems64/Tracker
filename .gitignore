@@ -3,3 +3,7 @@
 /python_tracker.egg-info
 /tests
 *.pyc
+*.pyo
+__pycache__
+*.egg-info
+*.egg
