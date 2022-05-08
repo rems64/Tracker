@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import time
+import pathlib
 
 description = "Run world reconstruction on input data"
 argparser = argparse.ArgumentParser(description=description)
@@ -21,10 +22,12 @@ if __name__ == "__main__":
 
     utils.log("Loading data from "+args.input, utils.logTypes.info)
     inputData = utils.open_json(args.input)
-    world = wd.createWorld(inputData)
+    world = wd.createWorld(inputData, str(pathlib.Path(args.input).parent))
 
     utils.log(world, utils.logTypes.warning)
-    utils.log(world.cameras[0], utils.logTypes.error)
+    # utils.log(world.cameras[0], utils.logTypes.error)
+
+    wd.generateDirections(world)
 
     end = time.time()
     utils.log("Pipeline finished in {:.2f} seconds".format(end - begin), utils.logTypes.timer)

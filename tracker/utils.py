@@ -115,3 +115,12 @@ def getSubAfterN(quadtree, n):
         if not subdivs[i].isEmpty():
             output += getSubAfterN(subdivs[i], n-1)
     return output
+
+
+def newtonSolve(f, df, x0, epsilon):
+    its = 0
+    while abs(f(x0)) > epsilon:
+        x0 = x0 - f(x0) / df(x0)
+        its+=1
+    print("Used newton, solved in {} iterations".format(its))
+    return x0
