@@ -2,6 +2,7 @@ from sympy import re
 import numpy as np
 from . import utils
 import tracker.cameraProjection as cproj
+import tracker.common as cmn
 import pathlib
 
 class World:
@@ -50,17 +51,6 @@ class Camera(WorldObject):
         return "Camera with id (" + str(self.id) + "). There are " + str(len(self.tracks)) + " tracks. " + super().__str__()
 
 
-class Track():
-    def __init__(self, name="defaultTrack", mapping=0):
-        self.frames = []
-        self.mapping = mapping
-
-class Frame():
-    def __init__(self, frame_number, point):
-        self.frame_number = frame_number
-        self.point = point
-        self.direction = []
-
 
 def getMapping(cam, i):
     for map in cam["tracksMap"]:
@@ -81,12 +71,12 @@ def createWorld(data, rootPath):
         tracks = []
         i=0
         for track in range(camData["infos"]["max_tracks"]):
-            tracks.append(Track("Track number " + str(track), getMapping(cam, i+1)))
+            tracks.append(cmn.Track("Track number " + str(track), getMapping(cam, i+1)))
             i+=1
         
         for frame in camData["frames"]:
             for i in range(len(frame["points"])):
-                tracks[i].frames.append(Frame(frame["frame_number"], frame["points"][i]))
+                tracks[i].frames.append(cmn.Frame(frame["frame_number"], frame["points"][i]))
         
         cameraObj.setTracks(tracks)
         # print(cameraObj.tracks[0].mapping)

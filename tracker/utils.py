@@ -17,35 +17,35 @@ class logTypes:
     error = colorit.Colors.red
     trace = colorit.Colors.white
 
-def open_video(video_file):
+def open_video(video_file: str) -> cv2.VideoCapture:
     """
     Open video file
     """
     cap = cv2.VideoCapture(video_file)
     return cap
 
-def save_bson(data, file_name):
+def save_bson(data, file_name: str) -> None:
     """
     Save the data in a json file
     """
     with open(file_name, "wb") as f:
         f.write(bson.dumps(data))
 
-def open_bson(file_name):
+def open_bson(file_name: str) -> dict:
     """
     Open the json file
     """
     with open(file_name, "rb") as f:
         return bson.loads(f.read())
 
-def open_json(file_name):
+def open_json(file_name: str):
     """
     Open the json file
     """
     with open(file_name, "r") as f:
         return json.loads(f.read())
 
-def log(msg, type=logTypes.info):
+def log(msg, type:logTypes=logTypes.info) -> None:
     """
     Log the data
     """
