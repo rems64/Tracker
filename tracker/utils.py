@@ -66,6 +66,8 @@ def permutations(l):
                 out.append(perm[:i] + [l[0]] + perm[i:])
         return out
 
+def distance(p1: tuple[float, float], p2: tuple[float, float]):
+    return np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
 
 def clamp(x, a, b):
     return x if x>=a and x<=b else (a if x<a else b)
