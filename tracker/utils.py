@@ -6,7 +6,6 @@ import colorit
 
 # colorit.init_colorit()
 
-
 class logTypes:
     """
     Log types

@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     utils.log("Processing video")
     b = time.time()
-    tracked = ft.trackFeatures(source, float(args.noise), int(args.frame_limit), True)
+    tracked = ft.trackFeatures(source, float(args.noise), int(args.frame_limit), False)
     utils.log("Tracking features took {} seconds".format(time.time() - b), utils.logTypes.timer)
     """
     utils.log("Processed successfully, solving features")
