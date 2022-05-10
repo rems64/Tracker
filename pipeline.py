@@ -38,7 +38,7 @@ if __name__ == "__main__":
     end = time.time()
 
     utils.log("Features solved, visualizing")
-    vz.visualize(utils.open_video(args.input), tracked)
+    vz.visualize(utils.open_video(args.input), solved)
 
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
