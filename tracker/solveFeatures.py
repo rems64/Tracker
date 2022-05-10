@@ -69,12 +69,13 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                     if track in ordered_tracks:
                         continue
                     if len(output.tracks[track].frames)<=0:
-                        distance = 10000
+                        distance = 100000                       # Ugly
                     else:
                         distance = point.distance(output.tracks[track].frames[-1].points[0])
                     if distance < closest_distance:
                         closest_track = track
                         closest_distance = distance
+                
                 # Add the point to the closest track
                 if closest_track is not None:
                     ordered_tracks.append(closest_track)
@@ -106,7 +107,7 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                     if track in ordered_tracks:
                         continue
                     if len(output.tracks[track].frames)<=0:
-                        distance = 1000
+                        distance = 100000                       # Ugly
                     else:
                         distance = point.distance(output.tracks[track].frames[-1].points[0])
                     if distance < closest_distance:
