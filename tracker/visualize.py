@@ -23,8 +23,11 @@ def visualize(cap, data: cmn.TrackedData):
             j=0
             for track in tracks:
                 frames = track.frames
-                idx = frame
-                while idx>=0 and len(frames)>idx and frames[idx]:
+                idx = frame+1
+                while idx>=0:
+                    if  idx>=len(frames) or not frames[idx]:
+                        idx-=1
+                        continue
                     if frames[idx].frame_number == frame and not frames[idx].empty:
                         loc = frames[idx].points[0].location
                         # print(frames[idx].points)
