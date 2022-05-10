@@ -20,9 +20,6 @@ if __name__ == "__main__":
     import tracker.utils as utils
 
     utils.log("Starting pipeline")
-    tab = [1,2,3,4,5]
-    perm = utils.permutations(tab)
-    print(len(perm))
 
     begin = time.time()
     source = ft.TrackingSource(args.input)
@@ -32,19 +29,17 @@ if __name__ == "__main__":
     b = time.time()
     tracked = ft.trackFeatures(source, float(args.noise), int(args.frame_limit), False)
     utils.log("Tracking features took {} seconds".format(time.time() - b), utils.logTypes.timer)
-    """
+    
     utils.log("Processed successfully, solving features")
     b = time.time()
-    solved = sf.solveBySpeed(tracked)
-    # solved = sf.smartSolve(tracked)
+    solved = sf.solveByNearestNeighbour(tracked)
     utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
+    
+    end = time.time()
 
     utils.log("Features solved, visualizing")
-
     vz.visualize(utils.open_video(args.input), tracked)
-    # vz.drawCurves(tracked)
-    """
-    end = time.time()
+
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
     # utils.save_bson(tracked, args.output)

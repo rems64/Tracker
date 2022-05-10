@@ -1,16 +1,17 @@
 import cv2
-from . import utils
-import matplotlib.pyplot as plt
 
-def visualize(cap, data):
+import tracker.common as cmn
+from . import utils
+
+def visualize(cap, data: cmn.TrackedData):
     frame = 0
     deltaDelayMs = int(1000/float(60))
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255), (255, 0, 255)]
     paused = False
-    tracks = data['tracks']
+    tracks = data.tracks
 
-    dx = cap.get(cv2.CAP_PROP_FRAME_WIDTH)/(2*data['infos']['width'])
-    dy = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)/(2*data['infos']['height'])
+    dx = cap.get(cv2.CAP_PROP_FRAME_WIDTH)/(2*data.input_width)
+    dy = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)/(2*data.input_height)
     if len(tracks)==0:
         utils.log("No track found")
         return
@@ -21,9 +22,9 @@ def visualize(cap, data):
             withTrack = sized.copy()
             j=0
             for track in tracks:
-                frames = track["frames"]
-                if frames[frame]["location"] and frames[frame]["location"]!=(0,0):
-                    loc = frames[frame]["location"]
+                frames = track.frames
+                if frames[frame] and not frames[frame].empty:
+                    loc = frames[frame].points[0].location
                     cv2.circle(withTrack, (int(dx*loc[0]), int(dy*loc[1])), 5, colors[j], -1)
                     cv2.putText(withTrack, str(j), (int(dx*loc[0])+5, int(dy*loc[1])+5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
                     j+=1
@@ -55,25 +56,3 @@ def visualize(cap, data):
             frame += 1
         else:
             break
-
-
-def drawCurves(data):
-    tracks = data["tracks"]
-    i=0
-    for track in tracks:
-        plt.figure()
-        plt.subplot(3, 1, 1)
-        plt.plot([frame["location"][0] for frame in track["frames"]])
-        plt.plot([frame["location"][1] for frame in track["frames"]])
-        plt.legend(["x", "y"])
-        plt.subplot(3, 1, 2)
-        plt.plot([track["frames"][i+1]["location"][0]-track["frames"][i]["location"][0] for i in range(len(track["frames"])-1)])
-        plt.plot([track["frames"][i+1]["location"][1]-track["frames"][i]["location"][1] for i in range(len(track["frames"])-1)])
-        plt.legend(["x", "y"])
-        plt.subplot(3, 1, 3)
-        plt.plot([track["frames"][i+2]["location"][0]-2*track["frames"][i+1]["location"][0]+track["frames"][i]["location"][0] for i in range(len(track["frames"])-2)])
-        plt.plot([track["frames"][i+2]["location"][1]-2*track["frames"][i+1]["location"][1]+track["frames"][i]["location"][1] for i in range(len(track["frames"])-2)])
-        plt.legend(["x", "y"])
-        plt.title("Track " + str(i+1))
-        i+=1
-    plt.show()

@@ -78,6 +78,8 @@ def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
 
     shouldExit = False
     tracked = RawTrackedData(source.video_path)
+    tracked.input_width = source.resolution[0]
+    tracked.input_height = source.resolution[1]
 
     while not shouldExit:
         ret, frame = source.readFrame()
@@ -111,3 +113,4 @@ def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
         tracked.newFrame()
     utils.log("Tracking finished", utils.logTypes.trace)
     utils.log("Tracked " + str(len(tracked.tracks)) + " tracks", utils.logTypes.info)
+    return tracked
