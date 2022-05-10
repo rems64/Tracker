@@ -23,12 +23,17 @@ def visualize(cap, data: cmn.TrackedData):
             j=0
             for track in tracks:
                 frames = track.frames
-                if frames[frame] and not frames[frame].empty:
-                    loc = frames[frame].points[0].location
-                    cv2.circle(withTrack, (int(dx*loc[0]), int(dy*loc[1])), 5, colors[j], -1)
-                    cv2.putText(withTrack, str(j), (int(dx*loc[0])+5, int(dy*loc[1])+5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
-                    j+=1
-            
+                idx = frame
+                while idx>=0 and len(frames)>idx and frames[idx]:
+                    if frames[idx].frame_number == frame and not frames[idx].empty:
+                        loc = frames[idx].points[0].location
+                        # print(frames[idx].points)
+                        cv2.circle(withTrack, (int(dx*loc[0]), int(dy*loc[1])), 5, colors[j], -1)
+                        cv2.putText(withTrack, str(j), (int(dx*loc[0])+5, int(dy*loc[1])+5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
+                        j+=1
+                        break
+                    idx-=1
+
             cv2.putText(withTrack, "Frame " + str(frame), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
             cv2.putText(withTrack, "Tracks : " + str(j), (sized.shape[1]-200, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
             cv2.putText(sized, "Frame " + str(frame), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1)
