@@ -25,26 +25,27 @@ if __name__ == "__main__":
     print(len(perm))
 
     begin = time.time()
-    cap = utils.open_video(args.input)
+    source = ft.TrackingSource(args.input)
+    source.loadVideo()
 
     utils.log("Processing video")
     b = time.time()
-    tracked = ft.trackFeatures(cap, float(args.noise), int(args.frame_limit), False, filename=args.input)
+    tracked = ft.trackFeatures(source, float(args.noise), int(args.frame_limit), False)
     utils.log("Tracking features took {} seconds".format(time.time() - b), utils.logTypes.timer)
-
+    """
     utils.log("Processed successfully, solving features")
     b = time.time()
     solved = sf.solveBySpeed(tracked)
     # solved = sf.smartSolve(tracked)
     utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
 
-    end = time.time()
     utils.log("Features solved, visualizing")
 
     vz.visualize(utils.open_video(args.input), tracked)
     # vz.drawCurves(tracked)
-
+    """
+    end = time.time()
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
-    utils.save_bson(tracked, args.output)
-    utils.log("Saved to {}".format(args.output))
+    # utils.save_bson(tracked, args.output)
+    # utils.log("Saved to {}".format(args.output))

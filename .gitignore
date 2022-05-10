@@ -2,8 +2,8 @@
 /dist
 /python_tracker.egg-info
 /tests
-*.pyc
+**/*.pyc
 *.pyo
-__pycache__
+__pycache__/
 *.egg-info
 *.egg
