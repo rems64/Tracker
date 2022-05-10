@@ -48,9 +48,10 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
     if permuts:
         if tracked.tracks_count > 8:
             utils.log("High number of points, permutations will take a huge amount of time", utils.logTypes.warning)
-        permutations_nbr = {n: utils.permutations([i for i in range(n)]) for n in range(tracked.tracks_count-2, tracked.tracks_count+2)}
+        permutations_nbr = {n: utils.permutations([i for i in range(n)]) for n in range(0, tracked.tracks_count+1)}
     # Assign the rest of the points to tracks
     for frame_number in range(1, frames_count):
+        frmsCount = 0
         points = frames[frame_number]
         # utils.log("Assigning " + str(len(points)) + " points to tracks", utils.logTypes.trace)
         # permutations = utils.permutations(points) if permuts else [points]
@@ -67,7 +68,10 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                 for track in range(len(output.tracks)):
                     if track in ordered_tracks:
                         continue
-                    distance = point.distance(output.tracks[track].frames[-1].points[0])
+                    if len(output.tracks[track].frames)<=0:
+                        distance = 10000
+                    else:
+                        distance = point.distance(output.tracks[track].frames[-1].points[0])
                     if distance < closest_distance:
                         closest_track = track
                         closest_distance = distance
@@ -101,7 +105,10 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                 for track in range(len(output.tracks)):
                     if track in ordered_tracks:
                         continue
-                    distance = point.distance(output.tracks[track].frames[-1].points[0])
+                    if len(output.tracks[track].frames)<=0:
+                        distance = 1000
+                    else:
+                        distance = point.distance(output.tracks[track].frames[-1].points[0])
                     if distance < closest_distance:
                         closest_track = track
                         closest_distance = distance
@@ -109,8 +116,10 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                 if closest_track is not None:
                     ordered_tracks.append(closest_track)
                     output.tracks[closest_track].appendFrame(cmn.Frame(frame_number, [point]))
+                    frmsCount += 1
                 else:
                     utils.log("No closest track found for point " + str(point), utils.logTypes.warning)
                     utils.log("Skipping point " + str(point), utils.logTypes.trace)
-                    continue            
+                    continue
+        print(frmsCount)
     return output
