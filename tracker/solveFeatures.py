@@ -121,5 +121,4 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
                     utils.log("No closest track found for point " + str(point), utils.logTypes.warning)
                     utils.log("Skipping point " + str(point), utils.logTypes.trace)
                     continue
-        print(frmsCount)
     return output
