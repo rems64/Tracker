@@ -55,6 +55,9 @@ class Track():
     def empty(self) -> bool:
         return len(self.frames) == 0
     
+    def containsFrame(self, frame_number: int) -> bool:
+        return frame_number in [frame.frame_number for frame in self.frames]
+    
     def __str__(self) -> str:
         return "Track containing " + str(len(self.frames)) + " frames with mapping to index " + str(self.mapping)
 
