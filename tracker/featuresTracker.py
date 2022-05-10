@@ -111,3 +111,4 @@ def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
         tracked.newFrame()
     utils.log("Tracking finished", utils.logTypes.trace)
     utils.log("Tracked " + str(len(tracked.tracks)) + " tracks", utils.logTypes.info)
+    return tracked
