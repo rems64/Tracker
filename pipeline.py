@@ -11,35 +11,41 @@ argparser.add_argument("-f", "--frame-limit", help="Number of frames to process"
 argparser.add_argument("-c", "--usecache", help="Use cached result", required=False, default=False)
 args = argparser.parse_args()
 
-
+# 150 à 180
 
 if __name__ == "__main__":
     import tracker.featuresTracker as ft
     import tracker.solveFeatures as sf
     import tracker.visualize as vz
     import tracker.utils as utils
+    import tracker.common as cmn
 
     utils.log("Starting pipeline")
 
     begin = time.time()
-    source = ft.TrackingSource(args.input)
-    source.loadVideo()
+    source = cmn.TrackingSource(args.input)
+    source.loadVideo(frame_limit=int(args.frame_limit))
 
+    utils.log_newline()
     utils.log("Processing video")
     b = time.time()
-    tracked = ft.trackFeatures(source, float(args.noise), int(args.frame_limit), False)
+    tracked = ft.trackFeatures(source, float(args.noise), False)
     utils.log("Tracking features took {} seconds".format(time.time() - b), utils.logTypes.timer)
     
+    utils.log_newline()
     utils.log("Processed successfully, solving features")
     b = time.time()
-    solved = sf.solveByNearestNeighbour(tracked)
+    # solved = sf.solveByNearestNeighbour(tracked)
+    solved = sf.solveBySmallestSpeed(tracked, True)
     utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
     
     end = time.time()
 
+    utils.log_newline()
     utils.log("Features solved, visualizing")
-    vz.visualize(utils.open_video(args.input), solved)
+    vz.visualize(source, solved)
 
+    utils.log_newline()
     utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
     
     # utils.save_bson(tracked, args.output)
