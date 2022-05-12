@@ -1,8 +1,10 @@
+from email import message
 import cv2
 import numpy as np
 import bson
 import json
 import colorit
+import progress.bar
 
 # colorit.init_colorit()
 
@@ -15,6 +17,33 @@ class logTypes:
     warning = colorit.Colors.yellow
     error = colorit.Colors.red
     trace = colorit.Colors.white
+
+def log(msg, type:logTypes=logTypes.info) -> None:
+    """
+    Log the data
+    """
+    pretext = "[WARN]" if type==logTypes.warning else "[INFO]" if type==logTypes.info or type==logTypes.trace else "[TIME]" if type==logTypes.timer else "[ERRO]"
+    print(colorit.color(pretext+" {}".format(msg), type))
+
+def log_newline() -> None:
+    """
+    Log a new line
+    """
+    print("")
+
+def logf(frame: int, target_frame: int, *args, **kwargs) -> None:
+    """
+    Log if target_frame matches frame
+    """
+    if frame==target_frame:
+        log(*args, **kwargs)
+
+class ProgressBar(progress.bar.IncrementalBar):
+    message = "Progress: "
+    suffix = "%(percent)d%%"
+    def __init__(self, *args, **kwargs):
+        super(progress.bar.IncrementalBar, self).__init__(*args, **kwargs)
+        self.start()
 
 def open_video(video_file: str) -> cv2.VideoCapture:
     """
@@ -43,13 +72,6 @@ def open_json(file_name: str):
     """
     with open(file_name, "r") as f:
         return json.loads(f.read())
-
-def log(msg, type:logTypes=logTypes.info) -> None:
-    """
-    Log the data
-    """
-    pretext = "[WARN]" if type==logTypes.warning else "[INFO]" if type==logTypes.info or type==logTypes.trace else "[TIME]" if type==logTypes.timer else "[ERRO]"
-    print(colorit.color(pretext+" {}".format(msg), type))
 
 
 def permutations(l):

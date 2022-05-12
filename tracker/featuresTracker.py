@@ -4,57 +4,6 @@ import numpy as np
 import cv2
 import uuid
 
-
-
-class TrackingSource:
-    def __init__(self, path: str):
-        self.type = "video" if path!="" else "live"    # Could be either video or live
-        self.uuid = str(uuid.uuid4().int)
-        self.video_path = path
-        self.video = None
-        self.fps = 0
-        self.frame_count = 0
-        self.resolution = (0, 0)
-        self.ratio = 1
-    
-    def loadVideo(self, video_path: str = "") -> bool:
-        if self.type != "video":
-            raise Exception("This source is not a video")
-        if video_path != "":
-            self.video_path = video_path
-        self.video = cv2.VideoCapture(self.video_path)
-        self.fps = self.video.get(cv2.CAP_PROP_FPS)
-        self.frame_count = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
-        self.resolution = (int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-        utils.log("Video loaded with resolution " + str(self.resolution) + " and " + str(self.frame_count) + " frames")
-        self.ratio = self.resolution[0] / self.resolution[1]
-        return True
-    
-    def readFrame(self) -> tuple[bool, np.ndarray]:
-        return self.video.read()
-
-
-class RawTrackedData(cmn.TrackedData):
-    """
-    Raw tracked data
-    """
-    def __init__(self, video_file: str):
-        cmn.TrackedData.__init__(self)
-        self.video_file = video_file
-        self._currentFrame = 0
-        self._trackInsertCounter = 0
-    
-    def newFrame(self):
-        self._currentFrame += 1
-        self._trackInsertCounter = 0
-    
-    def addTrackedPoint(self, point: cmn.Point):
-        if self._trackInsertCounter >= len(self.tracks):
-            while self._trackInsertCounter >= len(self.tracks):
-                self.tracks.append(cmn.Track(len(self.tracks)))
-        self.tracks[self._trackInsertCounter].appendFrame(cmn.Frame(self._currentFrame, [point]))
-        self._trackInsertCounter += 1
-
         
 
 def add_noise(frame, noise_level: float):
@@ -67,7 +16,7 @@ def add_noise(frame, noise_level: float):
 
 
 
-def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
+def trackFeatures(source, noise_level=0, show=False):
     """
     Track features in the video
     @param source: TrackingSource object
@@ -77,15 +26,19 @@ def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
     """
 
     shouldExit = False
-    tracked = RawTrackedData(source.video_path)
+    tracked = cmn.RawTrackedData(source.video_path)
     tracked.input_width = source.resolution[0]
     tracked.input_height = source.resolution[1]
 
+    source.setFrame(source.begin_frame)
+    tracked._currentFrame = source.begin_frame
+    bar = utils.ProgressBar("Tracking....", max=source.frame_count-source.begin_frame)
     while not shouldExit:
         ret, frame = source.readFrame()
-        if not ret or (frame_limit != 0 and (source.frame_count >= frame_limit)):
+        if not ret or tracked.currentFrame >= source.frame_count:
             shouldExit = True
             break
+        bar.next()
 
         if noise_level:
             frame = add_noise(frame, noise_level)
@@ -111,6 +64,6 @@ def trackFeatures(source, noise_level=0, frame_limit=0, show=False):
                 show = False
 
         tracked.newFrame()
-    utils.log("Tracking finished", utils.logTypes.trace)
-    utils.log("Tracked " + str(len(tracked.tracks)) + " tracks", utils.logTypes.info)
+    bar.finish()
+    utils.log("Tracked up to " + str(len(tracked.tracks)) + " tracks", utils.logTypes.info)
     return tracked
