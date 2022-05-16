@@ -1,5 +1,7 @@
 from inspect import currentframe
+import math
 import cv2
+import matplotlib.pyplot as plt
 
 import tracker.common as cmn
 from . import utils
@@ -73,3 +75,31 @@ def visualize(source: cmn.TrackingSource, data: cmn.TrackedData):
             frame += 1
         else:
             break
+
+def drawCurves(data: cmn.TrackedData, curves: list[str]=["position", "speed"]) -> None:
+    frames_count = data.frames_count
+    tracks = data.tracks
+    for curve in curves:
+        track_index = 1
+        plt.figure()
+        for track in tracks:
+            indices = [0 for _ in range(len(track.frames))]
+            x       = [0 for _ in range(len(track.frames))]
+            y       = [0 for _ in range(len(track.frames))]
+            if curve=="position":
+                for i in range(len(track.frames)):
+                    indices[i] = track.frames[i].frame_number
+                    x[i] = track.frames[i].points[0].x
+                    y[i] = track.frames[i].points[0].y
+            elif curve=="speed":
+                for i in range(len(track.frames)-1):
+                    indices[i] = track.frames[i].frame_number
+                    x[i] = (track.frames[i+1].points[0].x-track.frames[i].points[0].x)/(track.frames[i+1].frame_number-track.frames[i].frame_number)
+                    y[i] = (track.frames[i+1].points[0].y-track.frames[i].points[0].y)/(track.frames[i+1].frame_number-track.frames[i].frame_number)
+            plt.subplot(math.floor(len(data.tracks)**.5), math.ceil(len(data.tracks)**.5), track_index)
+            plt.plot(indices, x)
+            plt.plot(indices, y)
+            plt.xlim(0,frames_count)
+            plt.title("Track n°"+str(track_index))
+            track_index += 1
+    plt.show()
