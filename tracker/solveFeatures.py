@@ -127,7 +127,7 @@ def solveByNearestNeighbour(tracked: cmn.TrackedData, permuts: bool=True) -> cmn
 
 
 
-def solveBySmallestSpeed(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.TrackedData:
+def multipleSolve(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.TrackedData:
     """
     Solve by smallest speed
     """
@@ -172,10 +172,10 @@ def solveBySmallestSpeed(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.Tr
     # Assign the rest of the points to tracks
     # resolution = 50
     # logStep = int(frames_count/resolution)
-    # bar = utils.ProgressBar('Processing..', max=frames_count-1, suffix='%(percent)d%%')
+    bar = utils.ProgressBar('Processing..', max=frames_count-1, suffix='%(percent)d%%')
     for frame_number in range(1, frames_count):
         # if (frame_number+1) % logStep == 0:
-        # bar.next()
+        bar.next()
         frmsCount = 0
         points = frames[frame_number]
         scores = []
@@ -193,22 +193,21 @@ def solveBySmallestSpeed(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.Tr
                 for track in range(len(output.tracks)):
                     if track in ordered_tracks:
                         continue
-                    if len(output.tracks[track].frames)<2:
-                        if len(output.tracks[track].frames)<1:
-                            delta = 100000                      # Ugly
-                        else:
-                            delta = point.distance(output.tracks[track].frames[-1].points[0])
-                    else:
+                    if len(output.tracks[track].frames)>=3:
+                        actual_acceleration = (np.array(output.tracks[track].frames[-3].points[0].array - np.array(output.tracks[track].frames[-2].points[0].array)) / np.abs(output.tracks[track].frames[-3].frame_number-output.tracks[track].frames[-2].frame_number) \
+                            + np.array(output.tracks[track].frames[-1].points[0].array))/np.abs(output.tracks[track].frames[-2].frame_number-output.tracks[track].frames[-1].frame_number)
+                        target_acceleration = (np.array(output.tracks[track].frames[-2].points[0].array) - np.array(output.tracks[track].frames[-1].points[0].array)) / np.abs(output.tracks[track].frames[-2].frame_number-output.tracks[track].frames[-1].frame_number) \
+                            + (np.array(output.tracks[track].frames[-1].points[0].array)-np.array(point.array))/np.abs(output.tracks[track].frames[-1].frame_number-frame_number)
+                        delta = np.linalg.norm(target_acceleration-actual_acceleration)
+                    elif len(output.tracks[track].frames)>=2:
                         # Compute speed
-                        actual_speed = (np.array(output.tracks[track].frames[-1].points[0].array)-np.array(output.tracks[track].frames[-2].points[0].array))#/np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number)
-                        target_speed = (np.array(point.array)-np.array(output.tracks[track].frames[-1].points[0].array))#/np.abs(frame_number-output.tracks[track].frames[-1].frame_number)
+                        actual_speed = (np.array(output.tracks[track].frames[-1].points[0].array)-np.array(output.tracks[track].frames[-2].points[0].array))/np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number)
+                        target_speed = (np.array(point.array)-np.array(output.tracks[track].frames[-1].points[0].array))/np.abs(frame_number-output.tracks[track].frames[-1].frame_number)
                         delta = np.linalg.norm(target_speed-actual_speed)
-                        # if frame_number==15:
-                        #     print("Track: " + str(track))
-                        #     print(actual_speed)
-                        #     print(target_speed)
-                        #     print(delta)
-                        #     print("")
+                    elif len(output.tracks[track].frames)>=1:
+                        delta = point.distance(output.tracks[track].frames[-1].points[0])
+                    else:
+                        delta = 100000                      # Ugly
                     if delta < smallest_delta:
                         closest_track = track
                         smallest_delta = delta
@@ -242,19 +241,21 @@ def solveBySmallestSpeed(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.Tr
                 for track in range(len(output.tracks)):
                     if track in ordered_tracks:
                         continue
-                    if len(output.tracks[track].frames)<2:
-                        if len(output.tracks[track].frames)<1:
-                            delta = 100000                      # Ugly
-                        else:
-                            delta = point.distance(output.tracks[track].frames[-1].points[0])
-                    else:
+                    # if len(output.tracks[track].frames)>=3:
+                    #     actual_acceleration = (np.array(output.tracks[track].frames[-3].points[0].array) - 2*np.array(output.tracks[track].frames[-2].points[0].array) + np.array(output.tracks[track].frames[-1].points[0].array)) \
+                    #         / np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number) / np.abs(output.tracks[track].frames[-2].frame_number-output.tracks[track].frames[-3].frame_number)
+                    #     target_acceleration = (np.array(output.tracks[track].frames[-3].points[0].array) - 2*np.array(output.tracks[track].frames[-2].points[0].array) + np.array(point.array)) \
+                    #         / np.abs(frame_number-output.tracks[track].frames[-2].frame_number) / np.abs(output.tracks[track].frames[-2].frame_number-output.tracks[track].frames[-3].frame_number)
+                    #     delta = np.linalg.norm(target_acceleration-actual_acceleration)
+                    elif len(output.tracks[track].frames)>=2:
                         # Compute speed
-                        # print(np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number))
-                        # print(np.abs(frame_number-output.tracks[track].frames[-1].frame_number))
-                        # print("")
-                        actual_speed = np.array(output.tracks[track].frames[-1].points[0].array)-np.array(output.tracks[track].frames[-2].points[0].array)#/np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number)
-                        target_speed = np.array(point.array)-np.array(output.tracks[track].frames[-1].points[0].array)#/np.abs(frame_number-output.tracks[track].frames[-1].frame_number)
-                        delta = np.linalg.norm(actual_speed-target_speed)
+                        actual_speed = (np.array(output.tracks[track].frames[-1].points[0].array)-np.array(output.tracks[track].frames[-2].points[0].array))/np.abs(output.tracks[track].frames[-1].frame_number-output.tracks[track].frames[-2].frame_number)
+                        target_speed = (np.array(point.array)-np.array(output.tracks[track].frames[-1].points[0].array))/np.abs(frame_number-output.tracks[track].frames[-1].frame_number)
+                        delta = np.linalg.norm(target_speed-actual_speed)
+                    elif len(output.tracks[track].frames)>=1:
+                        delta = point.distance(output.tracks[track].frames[-1].points[0])
+                    else:
+                        delta = 100000                      # Ugly
                     if delta < smallest_delta:
                         closest_track = track
                         smallest_delta = delta
@@ -267,5 +268,5 @@ def solveBySmallestSpeed(tracked: cmn.TrackedData, permuts: bool=True) -> cmn.Tr
                     utils.log("No closest track found for point " + str(point), utils.logTypes.warning)
                     utils.log("Skipping point " + str(point), utils.logTypes.trace)
                     continue
-    # bar.finish()
+    bar.finish()
     return output
