@@ -9,6 +9,7 @@ argparser.add_argument("-o", "--output", help="Path to the output file", require
 argparser.add_argument("-n", "--noise", help="Noise level (0-1)", required=False, default=0)
 argparser.add_argument("-f", "--frame-limit", help="Number of frames to process", required=False, default=0)
 argparser.add_argument("-c", "--usecache", help="Use cached result", required=False, default=False)
+argparser.add_argument("-p", "--permutations", help="Use permutations", required=False, default=True)
 args = argparser.parse_args()
 
 # 150 à 180
@@ -30,23 +31,24 @@ if __name__ == "__main__":
     utils.log("Processing video")
     b = time.time()
     tracked = ft.trackFeatures(source, float(args.noise), False)
-    utils.log("Tracking features took {} seconds".format(time.time() - b), utils.logTypes.timer)
+    utils.log("Tracking features took {:.2f} seconds".format(time.time() - b), utils.logTypes.timer)
     
     utils.log_newline()
     utils.log("Processed successfully, solving features")
     b = time.time()
     # solved = sf.solveByNearestNeighbour(tracked)
-    solved = sf.solveBySmallestSpeed(tracked, True)
-    utils.log("Solving features took {} seconds".format(time.time() - b), utils.logTypes.timer)
+    solved = sf.multipleSolve(tracked, int(args.permutations))
+    utils.log("Solving features took {:.2f} seconds".format(time.time() - b), utils.logTypes.timer)
     
     end = time.time()
 
     utils.log_newline()
     utils.log("Features solved, visualizing")
     vz.visualize(source, solved)
+    # vz.drawCurves(solved)
 
     utils.log_newline()
-    utils.log("Pipeline finished in {} seconds".format(end - begin), utils.logTypes.timer)
+    utils.log("Pipeline finished in {:.2f} seconds".format(end - begin), utils.logTypes.timer)
     
     # utils.save_bson(tracked, args.output)
     # utils.log("Saved to {}".format(args.output))
