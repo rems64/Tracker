@@ -10,6 +10,7 @@ argparser.add_argument("-n", "--noise", help="Noise level (0-1)", required=False
 argparser.add_argument("-f", "--frame-limit", help="Number of frames to process", required=False, default=0)
 argparser.add_argument("-c", "--usecache", help="Use cached result", required=False, default=False)
 argparser.add_argument("-p", "--permutations", help="Use permutations", required=False, default=True)
+argparser.add_argument("-v", "--vizu", help="Use permutations", required=False, default="curves")
 args = argparser.parse_args()
 
 # 150 à 180
@@ -44,8 +45,10 @@ if __name__ == "__main__":
 
     utils.log_newline()
     utils.log("Features solved, visualizing")
-    vz.visualize(source, solved)
-    # vz.drawCurves(solved)
+    if args.vizu == "points":
+        vz.visualize(source, solved)
+    elif args.vizu == "curves":
+        vz.drawCurves(solved)
 
     utils.log_newline()
     utils.log("Pipeline finished in {:.2f} seconds".format(end - begin), utils.logTypes.timer)
