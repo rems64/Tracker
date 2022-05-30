@@ -40,8 +40,8 @@ def trackFeatures(source, noise_level=0, show=False):
             break
         bar.next()
 
-        if noise_level:
-            frame = add_noise(frame, noise_level)
+        # if noise_level:
+        #     frame = add_noise(frame, noise_level)
 
         ret, thresh = cv2.threshold(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 127, 255, 0) # Ugly, needs more refactoring
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -51,17 +51,17 @@ def trackFeatures(source, noise_level=0, show=False):
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
-                if show:
-                    cv2.polylines(frame, contour, True, (0, 255, 0), 2)
-                    detected.append((cx, cy))
+                # if show:
+                #     cv2.polylines(frame, contour, True, (0, 255, 0), 2)
+                #     detected.append((cx, cy))
                 tracked.addTrackedPoint(cmn.Point(cx, cy))
-        if show:
-            for c in detected:
-                cv2.circle(frame, c, 10, (0, 0, 255), 2)
-            cv2.imshow("Tracking...", frame)
-            key = cv2.waitKey(1)
-            if key==ord('q'):
-                show = False
+        # if show:
+        #     for c in detected:
+        #         cv2.circle(frame, c, 10, (0, 0, 255), 2)
+        #     cv2.imshow("Tracking...", frame)
+        #     key = cv2.waitKey(1)
+        #     if key==ord('q'):
+        #         show = False
 
         tracked.newFrame()
     bar.finish()

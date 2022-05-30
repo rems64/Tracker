@@ -18,7 +18,10 @@ class Frame():
         return len(self.points) == 0
     
     def __str__(self) -> str:
-        return "Frame number " + str(self.frame_number) + " with " + str(len(self.points)) + " points"
+        return "Frame " + str(self.frame_number) + " (" + str(len(self.points)) + ") points"
+    
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 class Point():
@@ -114,7 +117,8 @@ class TrackingSource:
         self.fps = self.video.get(cv2.CAP_PROP_FPS)
         self.frame_count = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)) if not frame_limit else frame_limit
         self.resolution = (int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-        utils.log("Video loaded with resolution " + str(self.resolution) + " and " + str(self.frame_count) + " frames")
+        utils.log("Video loaded with FPS: " + str(self.fps) + ", resolution (" + str(self.resolution) + ") and " + str(self.frame_count) + " frames", utils.logTypes.trace)
+        # utils.log("Video loaded with resolution " + str(self.resolution) + " and " + str(self.frame_count) + " frames")
         self.ratio = self.resolution[0] / self.resolution[1]
         return True
     
